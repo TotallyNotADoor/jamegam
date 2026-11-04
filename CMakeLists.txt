@@ -10,6 +10,6 @@ set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(raylib)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp functions.cpp functions.h)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)

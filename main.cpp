@@ -1,3 +1,4 @@
+#include "functions.h"
 #include "raylib.h"
 
 int main() {
@@ -7,6 +8,7 @@ int main() {
 
     while (!WindowShouldClose()) {
         BeginDrawing();
+        DrawGameUI();
         ClearBackground(RAYWHITE);
         EndDrawing();
     }
