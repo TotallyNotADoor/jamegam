@@ -1,4 +1,5 @@
 #include "functions.h"
+#include <raylib.h>
 
 void UpdateDrawFrame() {
     BeginDrawing();

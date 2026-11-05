@@ -1,5 +1,6 @@
 #include "functions.h"
-#include "raylib.h"
+#include <raylib.h>
+
 #if defined(PLATFORM_WEB)
     #include <emscripten.h>
 #endif
@@ -19,3 +20,5 @@ int main() {
     CloseWindow();
     return 0;
 }
+
+class A;
