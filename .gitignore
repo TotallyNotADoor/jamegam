@@ -18,3 +18,4 @@ CMakeUserPresets.json
 some_tips.txt
 /.zed/
 /.cache/clangd/index/
+.clangd
