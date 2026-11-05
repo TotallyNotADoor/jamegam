@@ -2,7 +2,6 @@
 #include "raylib.h"
 
 int main() {
-    // Initialize the window
     InitWindow(1920, 1080, "Game Title");
     SetTargetFPS(60);
 
