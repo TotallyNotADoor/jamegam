@@ -11,5 +11,18 @@ set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 add_subdirectory(raylib)
 
 add_executable(${PROJECT_NAME} main.cpp functions.cpp functions.h)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+
+if(PLATFORM STREQUAL "Web")
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+
+    target_link_options(${PROJECT_NAME} PRIVATE
+        "-sUSE_GLFW=3"
+        "-sASYNCIFY"
+        "--shell-file" "${CMAKE_SOURCE_DIR}/raylib/src/minshell.html"
+    )
+elseif(PLATFORM STREQUAL "Desktop")
+    if(WIN32)
+        target_link_libraries(${PROJECT_NAME} PRIVATE winmm glide3 opengl32)
+    endif()
+endif()
