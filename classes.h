@@ -13,6 +13,16 @@ class GameObject {
         void ChangePosition(float x, float y);
 };
 
+class Sprite : public GameObject {
+    private:
+        Image Texture;
+    public:
+        Sprite(std::string path);
+        Sprite(Image image);
+        void SetTexture();
+        void Draw();
+};
+
 class Entity : public GameObject {
     private:
         Vector2 Velocity;
