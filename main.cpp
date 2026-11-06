@@ -1,4 +1,5 @@
 #include "functions.h"
+#include "classes.h"
 #include <raylib.h>
 
 #if defined(PLATFORM_WEB)
@@ -21,4 +22,3 @@ int main() {
     return 0;
 }
 
-class A;

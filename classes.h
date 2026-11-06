@@ -3,19 +3,29 @@
 #include <string>
 
 class GameObject {
-private:
-    // Pola klasy (atrybuty)
-    std::string Name;
-    Vector2 Position;
+    private:
+        std::string Name;
+        Vector2 Position;
+    public:
+        std::string getName();
+        Vector2 getPosition();
+        void SetPosition(float x, float y);
+        void ChangePosition(float x, float y);
+};
 
-public:
-    // Konstruktor
-    GameObject(std::string name, float x, float y);
+class Entity : public GameObject {
+    private:
+        Vector2 Velocity;
+        float Friction;
+    public:
+        Vector2 getVelocity();
+        float getFriction();
+        void SetVelocity(float x, float y);
+        void SetFriction(float friction);
+        void ChangeVelocity(float x,  float y);
+        void ChangeFriction(float friction);
 
-    GameObject(float x, float y);
-
-    void SetPosition(float x, float y);
-
-    void ChangePosition(float x, float y);
-
+        void ApplyFriction();
+        void ApplyVelocity();
+        void Move();
 };
