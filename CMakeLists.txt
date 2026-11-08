@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(main CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -10,7 +10,12 @@ set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(raylib)
 
-add_executable(${PROJECT_NAME} main.cpp functions.cpp functions.h)
+add_executable(${PROJECT_NAME}
+main.cpp
+functions.h functions.cpp
+nicetea.h nicetea.cpp
+)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 if(PLATFORM STREQUAL "Web")
