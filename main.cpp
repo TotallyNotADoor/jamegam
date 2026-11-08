@@ -7,6 +7,13 @@
     #include <emscripten.h>
 #endif
 
+void UpdateDrawFrame() {
+    BeginDrawing();
+    ClearBackground(WHITE);
+    DrawText("Hello there.", 530, 320, 40, BLACK);
+    EndDrawing();
+}
+
 int main() {
     InitWindow(1280, 720, "Game Title");
     SetExitKey(KEY_NULL);
