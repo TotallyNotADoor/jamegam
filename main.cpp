@@ -1,5 +1,5 @@
 #include "functions.h"
-#include "nicetea.h"
+#include "nicetea/nicetea.h"
 #include <raylib.h>
 #include <raymath.h>
 

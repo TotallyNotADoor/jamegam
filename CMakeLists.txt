@@ -13,7 +13,7 @@ add_subdirectory(raylib)
 add_executable(${PROJECT_NAME}
 main.cpp
 functions.h functions.cpp
-nicetea.h nicetea.cpp
+nicetea/nicetea.h nicetea/nicetea.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
