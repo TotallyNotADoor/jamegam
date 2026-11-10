@@ -3,6 +3,7 @@
 #include <raymath.h>
 #include <vector>
 #include <string>
+#include <cmath>
 
 class GameObject {
     public:
@@ -15,7 +16,7 @@ class Sprite : public GameObject {      //A sprite
         Texture2D Texture;
     public:
         Image Asset;
-        Sprite() = default;
+        Sprite();
         Sprite(std::string path);
         Sprite(Image image, bool copy);
         void MakeTexture();
@@ -58,7 +59,7 @@ class AnimatedSpriteEx : public AnimatedSprite {
 class Entity : public GameObject {      //An entity existing in the game world. Will be the parent of PhysicsEntity
     public:
         Vector2 Velocity;
-        float Friction;
+        float Friction;     //!!!Important!!! this is a multiplier for velocity, so it should be ALWAYS <0
         Entity();
         Entity(float friction);
         void ApplyFriction();   //Apply friction to velocity (so that it does not just go forever, were not in space)
@@ -70,8 +71,8 @@ class Entity : public GameObject {      //An entity existing in the game world. 
 class PhysicsEntity : public Entity {
     public:
         Vector2 Gravity;
-        float GravityStrenght;
+        float GravityStrength;
         PhysicsEntity();
-        PhysicsEntity(float gravity_strenght);
+        PhysicsEntity(float gravity_strength);
         void ApplyGravity();
 };

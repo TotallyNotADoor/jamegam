@@ -6,6 +6,9 @@ GameObject::GameObject() {
 }
 
 /******** Sprite ********/
+Sprite::Sprite() : Texture{0, 0, 0, 0, 0},  Asset{nullptr, 0, 0, 0, 0} {
+
+}
 Sprite::Sprite(std::string path) {
     Asset = LoadImage(path.c_str());
 }
@@ -14,36 +17,31 @@ Sprite::Sprite(Image image, bool copy) {
     else Asset = image;
 }
 void Sprite::MakeTexture() {
+    if(Texture.id > 0) UnloadTexture(Texture);
     Texture = LoadTextureFromImage(Asset);
 }
 void Sprite::Draw() const {
     DrawTexture(Texture, lround(Position.x), lround(Position.y), WHITE);
 }
 Sprite::~Sprite() {
-    UnloadImage(Asset);
-    UnloadTexture(Texture);
+    if(Asset.data != nullptr)  UnloadImage(Asset);
+    if(Texture.id > 0) UnloadTexture(Texture);
 }
 
 /******** AtlasSprite ********/
 void AtlasSprite::Draw() const {
-    DrawTextureRec(Texture, AtlasPos, Position, WHITE);
+    if(Texture.id > 0) DrawTextureRec(Texture, AtlasPos, Position, WHITE);
 }
 
 /******** AnimatedSprite ********/
-AnimatedSprite::AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf) : Sprite(path), Frames(frames), FpF(fpf) {
+AnimatedSprite::AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf) : Sprite(path), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
     AtlasPos.resize(frames);
-    unsigned int Frame = 0;
-    unsigned int Timer = 0;
 }
-AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf) : Sprite(image, false), Frames(frames), FpF(fpf) {
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf) : Sprite(image, false), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
     AtlasPos.resize(frames);
-    unsigned int Frame = 0;
-    unsigned int Timer = 0;
 }
-AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy) : Sprite(image, copy), Frames(frames), FpF(fpf) {
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy) : Sprite(image, copy), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
     AtlasPos.resize(frames);
-    unsigned int Frame = 0;
-    unsigned int Timer = 0;
 }
 void AnimatedSprite::Update() {
     Timer++;
@@ -67,7 +65,7 @@ Entity::Entity(float friction) {
     Friction = friction;
 }
 void Entity::ApplyFriction() {
-    Velocity = Vector2AddValue(Velocity, Friction);
+    Velocity = Vector2Scale(Velocity, Friction);
 }
 void Entity::ApplyVelocity() {
     Position =  Vector2Add(Position, Velocity);
@@ -83,12 +81,12 @@ void Entity::Move() {
 /******** PhysicsEntity ********/
 PhysicsEntity::PhysicsEntity() {
     Gravity = {0.0f, 1.0f};
-    GravityStrenght = 1.0f;
+    GravityStrength = 1.0f;
 }
 PhysicsEntity::PhysicsEntity(float gravity_strenght) {
     Gravity = {0.0f, 1.0f};
-    GravityStrenght = gravity_strenght;
+    GravityStrength = gravity_strenght;
 }
 void PhysicsEntity::ApplyGravity() {
-    ApplyForce(Vector2Multiply(Gravity, {GravityStrenght, GravityStrenght}));
+    ApplyForce(Vector2Multiply(Gravity, {GravityStrength, GravityStrength}));
 }
