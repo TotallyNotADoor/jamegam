@@ -12,7 +12,6 @@ add_subdirectory(raylib)
 
 add_executable(${PROJECT_NAME}
 main.cpp
-functions.h functions.cpp
 nicetea/nicetea.h nicetea/nicetea.cpp
 )
 

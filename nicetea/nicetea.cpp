@@ -7,21 +7,31 @@ GameObject::GameObject() {
 
 /******** Sprite ********/
 Sprite::Sprite() : Texture{0, 0, 0, 0, 0},  Asset{nullptr, 0, 0, 0, 0} {
-
 }
-Sprite::Sprite(std::string path) {
+Sprite::Sprite(const std::string& path) {
     Asset = LoadImage(path.c_str());
+    MakeTexture();
+}
+Sprite::Sprite(Image image) {
+    Asset = image;
+    MakeTexture();
 }
 Sprite::Sprite(Image image, bool copy) {
     if(copy) Asset = ImageCopy(image);
     else Asset = image;
+    MakeTexture();
+}
+Sprite::Sprite(Sprite&& other) noexcept
+    : Texture(other.Texture), Asset(other.Asset) {
+    other.Texture = {0, 0, 0, 0, 0}; // Reset source so it doesn't delete them
+    other.Asset = {nullptr, 0, 0, 0, 0};
 }
 void Sprite::MakeTexture() {
     if(Texture.id > 0) UnloadTexture(Texture);
     Texture = LoadTextureFromImage(Asset);
 }
 void Sprite::Draw() const {
-    DrawTexture(Texture, lround(Position.x), lround(Position.y), WHITE);
+    if(Texture.id >0) DrawTexture(Texture, lround(Position.x), lround(Position.y), WHITE);
 }
 Sprite::~Sprite() {
     if(Asset.data != nullptr)  UnloadImage(Asset);
@@ -58,7 +68,7 @@ void AnimatedSprite::Draw() const {
 /******** Entity ********/
 Entity::Entity() {
     Velocity = {0.0f, 0.0f};
-    Friction = 1.0f;
+    Friction = 0.9f;
 }
 Entity::Entity(float friction) {
     Velocity = {0.0f, 0.0f};

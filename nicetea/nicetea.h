@@ -17,23 +17,27 @@ class Sprite : public GameObject {      //A sprite
     public:
         Image Asset;
         Sprite();
-        Sprite(std::string path);
+        explicit Sprite(const std::string& path);
+        Sprite(Image image);
         Sprite(Image image, bool copy);
+        Sprite(Sprite&& other) noexcept;
+        Sprite& operator=(Sprite&& other) noexcept;
+
+        Sprite(const Sprite&) = delete;
+        Sprite& operator=(const Sprite&) = delete;
+
         void MakeTexture();
         virtual void Draw() const;
 
         virtual ~Sprite();
 
-        Sprite(const Sprite&) = delete;
-        Sprite& operator=(const Sprite&) = delete;
 };
 
 class AtlasSprite : public Sprite {     //A sprite, but it uses an atlas instead of an image
     public:
         Rectangle AtlasPos;
         AtlasSprite(std::string path, Rectangle position) : Sprite(path), AtlasPos(position){};
-        AtlasSprite(Image image, Rectangle position) : Sprite(image, false) , AtlasPos(position){};
-        AtlasSprite(Image image, Rectangle position, bool copy) : Sprite(image, copy) , AtlasPos(position){}    //with this you can use an image thats already loaded (Image = Image only passes a pointer reference)
+        AtlasSprite(Image image, Rectangle position) : Sprite(image, false) , AtlasPos(position){}; //with this you can use an image thats already loaded (Image = Image only passes a pointer reference)
         void Draw() const override;
 };
 
@@ -61,7 +65,7 @@ class Entity : public GameObject {      //An entity existing in the game world. 
         Vector2 Velocity;
         float Friction;     //!!!Important!!! this is a multiplier for velocity, so it should be ALWAYS <0
         Entity();
-        Entity(float friction);
+        explicit Entity(float friction);
         void ApplyFriction();   //Apply friction to velocity (so that it does not just go forever, were not in space)
         void ApplyVelocity();   //Change position by velocity
         void ApplyForce(Vector2 force);
