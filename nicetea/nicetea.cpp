@@ -9,8 +9,9 @@ GameObject::GameObject() {
 Sprite::Sprite(std::string path) {
     Asset = LoadImage(path.c_str());
 }
-Sprite::Sprite(const Image& image) {
-    Asset = image;
+Sprite::Sprite(Image image, bool copy) {
+    if(copy) Asset = ImageCopy(image);
+    else Asset = image;
 }
 void Sprite::MakeTexture() {
     Texture = LoadTextureFromImage(Asset);
@@ -29,15 +30,26 @@ void AtlasSprite::Draw() const {
 }
 
 /******** AnimatedSprite ********/
-void AnimatedSprite::ChangeSize(unsigned int new_frames) {
-    Frames = new_frames;
-    AtlasPos.resize(new_frames);
+AnimatedSprite::AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf) : Sprite(path), Frames(frames), FpF(fpf) {
+    AtlasPos.resize(frames);
+    unsigned int Frame = 0;
+    unsigned int Timer = 0;
+}
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf) : Sprite(image, false), Frames(frames), FpF(fpf) {
+    AtlasPos.resize(frames);
+    unsigned int Frame = 0;
+    unsigned int Timer = 0;
+}
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy) : Sprite(image, copy), Frames(frames), FpF(fpf) {
+    AtlasPos.resize(frames);
+    unsigned int Frame = 0;
+    unsigned int Timer = 0;
 }
 void AnimatedSprite::Update() {
     Timer++;
-    if(Timer>FpF) {
+    if(Timer >= FpF) {
         Frame++;
-        if(Frame>Frames) Frame = 1;
+        if(Frame >= Frames) Frame = 0;
         Timer = 0;
     }
 }
@@ -46,6 +58,14 @@ void AnimatedSprite::Draw() const {
 }
 
 /******** Entity ********/
+Entity::Entity() {
+    Velocity = {0.0f, 0.0f};
+    Friction = 1.0f;
+}
+Entity::Entity(float friction) {
+    Velocity = {0.0f, 0.0f};
+    Friction = friction;
+}
 void Entity::ApplyFriction() {
     Velocity = Vector2AddValue(Velocity, Friction);
 }
@@ -58,4 +78,17 @@ void Entity::ApplyForce(Vector2 force) {
 void Entity::Move() {
     ApplyFriction();
     ApplyVelocity();
+}
+
+/******** PhysicsEntity ********/
+PhysicsEntity::PhysicsEntity() {
+    Gravity = {0.0f, 1.0f};
+    GravityStrenght = 1.0f;
+}
+PhysicsEntity::PhysicsEntity(float gravity_strenght) {
+    Gravity = {0.0f, 1.0f};
+    GravityStrenght = gravity_strenght;
+}
+void PhysicsEntity::ApplyGravity() {
+    ApplyForce(Vector2Multiply(Gravity, {GravityStrenght, GravityStrenght}));
 }

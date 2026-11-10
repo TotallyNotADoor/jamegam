@@ -17,7 +17,7 @@ class Sprite : public GameObject {      //A sprite
         Image Asset;
         Sprite() = default;
         Sprite(std::string path);
-        Sprite(const Image& image);
+        Sprite(Image image, bool copy);
         void MakeTexture();
         virtual void Draw() const;
 
@@ -31,21 +31,22 @@ class AtlasSprite : public Sprite {     //A sprite, but it uses an atlas instead
     public:
         Rectangle AtlasPos;
         AtlasSprite(std::string path, Rectangle position) : Sprite(path), AtlasPos(position){};
-        AtlasSprite(Image image, Rectangle position) : Sprite(image) , AtlasPos(position){};
+        AtlasSprite(Image image, Rectangle position) : Sprite(image, false) , AtlasPos(position){};
+        AtlasSprite(Image image, Rectangle position, bool copy) : Sprite(image, copy) , AtlasPos(position){}    //with this you can use an image thats already loaded (Image = Image only passes a pointer reference)
         void Draw() const override;
 };
 
-class AnimatedSprite : public Sprite {      //An animated sprite using an atlas and a set of rectangles
+class AnimatedSprite : public Sprite {      //An animated sprite using an atlas and a set of rectangles (as positions in the atlas)
     protected:
-        unsigned int Frame;
+        unsigned int Frame;                 //What frame rn
         unsigned int Timer;
-        unsigned int Frames;
+        unsigned int Frames;                //How many frames
     public:
-        unsigned int FpF;
-        std::vector<Rectangle> AtlasPos;
-        AnimatedSprite(std::string path, unsigned int frames) : Sprite(path), Frames(frames){};
-        AnimatedSprite(Image image, unsigned int frames) : Sprite(image), Frames(frames){};
-        void ChangeSize(unsigned int new_frames);
+        unsigned int FpF;                   //Frames per Frame (Game frames  per  1 Animation frame )
+        std::vector<Rectangle> AtlasPos;    //The set of atlas positions. Automatically initialized with constructor
+        AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf);
+        AnimatedSprite(Image image, unsigned int frames, unsigned int fpf);
+        AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy);
         void Update();
         void Draw() const override;
 };
@@ -58,8 +59,19 @@ class Entity : public GameObject {      //An entity existing in the game world. 
     public:
         Vector2 Velocity;
         float Friction;
+        Entity();
+        Entity(float friction);
         void ApplyFriction();   //Apply friction to velocity (so that it does not just go forever, were not in space)
         void ApplyVelocity();   //Change position by velocity
         void ApplyForce(Vector2 force);
         void Move();            //Both of the above combined, will potentially expand it to do more stuff
+};
+
+class PhysicsEntity : public Entity {
+    public:
+        Vector2 Gravity;
+        float GravityStrenght;
+        PhysicsEntity();
+        PhysicsEntity(float gravity_strenght);
+        void ApplyGravity();
 };

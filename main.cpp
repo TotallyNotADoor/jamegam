@@ -1,4 +1,3 @@
-#include "functions.h"
 #include "nicetea/nicetea.h"
 #include <raylib.h>
 #include <raymath.h>
@@ -11,6 +10,7 @@ void UpdateDrawFrame() {
     BeginDrawing();
     ClearBackground(WHITE);
     DrawText("Hello there.", 530, 320, 40, BLACK);
+
     EndDrawing();
 }
 
