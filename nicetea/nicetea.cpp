@@ -21,14 +21,13 @@ Sprite::Sprite(Image image, bool copy) {
     else Asset = image;
     MakeTexture();
 }
-Sprite::Sprite(Sprite&& other) noexcept
-    : Texture(other.Texture), Asset(other.Asset) {
+Sprite::Sprite(Sprite&& other) noexcept : Texture(other.Texture), Asset(other.Asset) {
     other.Texture = {0, 0, 0, 0, 0}; // Reset source so it doesn't delete them
     other.Asset = {nullptr, 0, 0, 0, 0};
 }
 void Sprite::MakeTexture() {
-    if(Texture.id > 0) UnloadTexture(Texture);
-    Texture = LoadTextureFromImage(Asset);
+    if(Texture.id > 0) UpdateTexture(Texture, Asset.data);
+    else Texture = LoadTextureFromImage(Asset);
 }
 void Sprite::Draw() const {
     if(Texture.id >0) DrawTexture(Texture, lround(Position.x), lround(Position.y), WHITE);
@@ -39,30 +38,34 @@ Sprite::~Sprite() {
 }
 
 /******** AtlasSprite ********/
+AtlasSprite::AtlasSprite(std::string path, unsigned int frames) : Sprite(path), Frames(frames), Frame(0) {
+    AtlasPos.resize(frames);
+}
+AtlasSprite::AtlasSprite(Image image, unsigned int frames) : Sprite(image, false), Frames(frames), Frame(0) {
+    AtlasPos.resize(frames);
+}
+AtlasSprite::AtlasSprite(Image image, unsigned int frames, bool copy) : Sprite(image, copy), Frames(frames), Frame(0) {
+    AtlasPos.resize(frames);
+}
+void AtlasSprite::SetFrame(unsigned int frame) {
+    if(frame <= Frames) Frame = frame;
+    else Frame = frame%Frames;
+}
 void AtlasSprite::Draw() const {
-    if(Texture.id > 0) DrawTextureRec(Texture, AtlasPos, Position, WHITE);
+    if(Texture.id > 0) DrawTextureRec(Texture, AtlasPos[Frame], Position, WHITE);
 }
 
 /******** AnimatedSprite ********/
-AnimatedSprite::AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf) : Sprite(path), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
-    AtlasPos.resize(frames);
-}
-AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf) : Sprite(image, false), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
-    AtlasPos.resize(frames);
-}
-AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy) : Sprite(image, copy), Frames(frames), FpF(fpf), Frame(0), Timer(0) {
-    AtlasPos.resize(frames);
-}
+AnimatedSprite::AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf) : AtlasSprite(path, frames), FramesPerFrame(fpf), Timer(0) {}
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf) : AtlasSprite(image, frames), FramesPerFrame(fpf), Timer(0) {}
+AnimatedSprite::AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy) : AtlasSprite(image, copy), FramesPerFrame(fpf), Timer(0) {}
 void AnimatedSprite::Update() {
     Timer++;
-    if(Timer >= FpF) {
+    if(Timer >= FramesPerFrame) {
         Frame++;
         if(Frame >= Frames) Frame = 0;
         Timer = 0;
     }
-}
-void AnimatedSprite::Draw() const {
-    DrawTextureRec(Texture, AtlasPos[Frame], Position, WHITE);
 }
 
 /******** Entity ********/

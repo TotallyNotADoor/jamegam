@@ -10,9 +10,10 @@ set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(raylib)
 
-add_executable(${PROJECT_NAME}
+add_executable(
+${PROJECT_NAME}
 main.cpp
-nicetea/nicetea.h nicetea/nicetea.cpp
+nicetea/nicetea.h   nicetea/nicetea.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
