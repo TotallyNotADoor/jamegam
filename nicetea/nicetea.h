@@ -4,23 +4,43 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <climits>
+using namespace std;
 
-class GameObject {										//An object that exists in the game world
+constexpr unsigned int UINT_NAN = UINT_MAX;
+
+struct LevelHitbox{
+	Rectangle Hitbox;
+	bool Active;
+};
+
+extern vector<LevelHitbox> LevelHitboxes;
+
+bool LoadLevel(const string& path);
+bool SaveLevel(const string& path);
+
+template<typename Type>
+short Sign(Type val) noexcept {
+    return (Type(0) < val) - (val < Type(0));
+}
+
+class GameObject {
 	public:
 		Vector2 Position;
+
 		GameObject();
 };
 
-class Sprite : public GameObject {						//A base class for objects that are rendered to the screen
-														//It's very complicated and important, a literal backbone of rendering
+class Sprite : public virtual GameObject {
 	protected:
 		Texture2D Texture;
 	public:
 		Image Asset;
+
 		Sprite();
-		explicit Sprite(const std::string& path);
+		explicit Sprite(const string& path);
 		Sprite(Image image);
-		Sprite(Image image, bool copy);
+
 		Sprite(Sprite&& other) noexcept;
 		Sprite& operator=(Sprite&& other) noexcept;
 
@@ -33,51 +53,76 @@ class Sprite : public GameObject {						//A base class for objects that are rend
 		virtual ~Sprite();
 };
 
-class AtlasSprite : public Sprite {						//A sprite, but it uses an atlas instead of an image for easy sprite swapping (for animations use AnimatedSprite or AnimatedSpriteEx tho)
+class AtlasSprite : public Sprite {
 	protected:
-		unsigned int Frame;					//What frame (sprite) rn
-		unsigned int Frames;				//How many frames
+		unsigned int Frame;
+		unsigned int Frames;
 	public:
-		std::vector<Rectangle> AtlasPos;	//The set of atlas positions. Automatically initialized by constructor
-		AtlasSprite(std::string path, unsigned int frames);
+		vector<Rectangle> AtlasPos;
+
+		AtlasSprite();
+		AtlasSprite(const string& path, unsigned int frames);
 		AtlasSprite(Image image, unsigned int frames);
-		AtlasSprite(Image image, unsigned int frames, bool copy);
+
 		void SetFrame(unsigned int frame);
+		void ChangeFrame(unsigned int change);
+
 		virtual void Draw() const override;
 };
 
-class AnimatedSprite : public AtlasSprite {				//An animated sprite using an atlas and a set of rectanges
+class AnimatedSprite : public AtlasSprite {
 	protected:
 		unsigned int Timer;
 	public:
-		unsigned int FramesPerFrame;		//Frames per Frame (Game frames per 1 Animation frame)
-		AnimatedSprite(std::string path, unsigned int frames, unsigned int fpf);
+		unsigned int FramesPerFrame;
+
+		AnimatedSprite();
+		AnimatedSprite(const string& path, unsigned int frames, unsigned int fpf);
 		AnimatedSprite(Image image, unsigned int frames, unsigned int fpf);
-		AnimatedSprite(Image image, unsigned int frames, unsigned int fpf, bool copy);
-		void Update();
+
+		void SetTimer(unsigned int timer);
+		void ChangeTimer(unsigned int change);
+		void UpdateAnimation();
 };
 
-class AnimatedSpriteEx : public AnimatedSprite {		//AnimatedSprite with muliple animations
+class AnimatedSpriteEx : public AnimatedSprite {
 	//ToDo
 };
 
-class Entity : public GameObject {				//An entity existing in the game world. Will be the parent of PhysicsEntity
+class PhysicsObject : public virtual GameObject {
 	public:
+		Rectangle Hitbox;
 		Vector2 Velocity;
-		float Friction;							//!!!Important!!! this is a multiplier for velocity, so it should be  ALWAYS  Friction ∈ (0, 1)
-		Entity();
-		explicit Entity(float friction);
-		void ApplyFriction();					//Apply friction to velocity (so that it does not just go forever, were not in space)
-		void ApplyVelocity();					//Change position by velocity
-		void ApplyForce(Vector2 force);			//Apply a force to velocity (change velocity by Vector2)
-		void Move();							//Both ApplyFriction and ApplyVelocity combined, will be potentially expanded it to do more stuff
+		Vector2 MaxVelocity;
+		Vector2 Gravity;
+		float Friction;
+		float GravityStrength;
+		unsigned int CurrentCollisionID;
+		bool Grounded;
+		PhysicsObject();
+		PhysicsObject(float gravity_strength, float friction);
+		PhysicsObject(float gravity_strength, float friction, Vector2 max_velocity);
+
+		void ApplyFriction(bool affect_y);
+		void ApplyGravity();
+		void ApplyForce(Vector2 force);
+
+		bool IsCollidingWithLevel();
+	protected:
+		bool IsCollidingWithCurrentCollider();
+	public:
+		void MoveAndCollide();
+		void TickPhysics();
 };
 
-class PhysicsEntity : public Entity {					//Entity with Gravity methods
+class PhysicsEntity : public PhysicsObject, public AnimatedSprite {
 	public:
-		Vector2 Gravity;
-		float GravityStrength;
-		PhysicsEntity();
-		PhysicsEntity(float gravity_strength);
-		void ApplyGravity();
+		PhysicsEntity(const string& path, unsigned int frames, unsigned int fpf);
+		PhysicsEntity(Image image, unsigned int frames, unsigned int fpf);
+		PhysicsEntity(float gravity_strength, float friction, const string& path, unsigned int frames, unsigned int fpf);
+		PhysicsEntity(float gravity_strength, float friction, Image image, unsigned int frames, unsigned int fpf);
+		PhysicsEntity(float gravity_strength, float friction, Vector2 max_velocity, const string& path, unsigned int frames, unsigned int fpf);
+		PhysicsEntity(float gravity_strength, float friction, Vector2 max_velocity, Image image, unsigned int frames, unsigned int fpf);
+
+
 };

@@ -7,7 +7,7 @@
 int main() {
 	InitWindow(1280, 720, "Game Title");
 	SetExitKey(KEY_NULL);
-	bool quit = false;
+	bool Quit = false;
 
 	//Variable definitions
 
@@ -16,9 +16,8 @@ int main() {
 
 		BeginDrawing();
 
-		ClearBackground(WHITE);
+		ClearBackground({ 20, 20, 30, 255 });
 		DrawText("Hello there.", 530, 320, 40, BLACK);
-
 		EndDrawing();
 	};
 
@@ -26,15 +25,16 @@ int main() {
 	emscripten_set_main_loop_arg(
 		[](void* arg) {
 			auto* fn = static_cast<decltype(UpdateDrawFrame)*>(arg);
+			(*fn)();
 		},
 		&UpdateDrawFrame,
-		0,
+		60,
 		1
 	);
 #else
 	SetTargetFPS(60);
-	while (!quit) {
-		if (WindowShouldClose()) quit = true;
+	while (!Quit) {
+		if (WindowShouldClose()) Quit = true;
 		UpdateDrawFrame();
 	}
 #endif
